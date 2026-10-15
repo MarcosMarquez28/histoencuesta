@@ -22,7 +22,7 @@
   </head>
   <body>
     <main class="page-shell">
-      <section class="quiz-card" aria-labelledby="page-title">
+      <section class="quiz-card" aria-label="Encuesta sobre métodos de aprendizaje">
         <header class="brand-header">
           <div class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
@@ -39,7 +39,36 @@
           <span class="brand-name">MODO DE APRENDER</span>
         </header>
 
-        <div id="quizSection" class="quiz-content">
+        <div id="welcome-screen" class="welcome-content" aria-labelledby="welcome-title">
+          <div class="welcome-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M4 5.75A2.75 2.75 0 0 1 6.75 3H20v15H6.75A2.75 2.75 0 0 0 4 20.75v-15Z"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M4 18.5a2.75 2.75 0 0 1 2.75-2.75H20M8 7h8M8 10.5h6"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+          <p class="eyebrow">UNA PAUSA PARA DESCUBRIR</p>
+          <h1 id="welcome-title">Bienvenido a la Encuesta sobre Métodos de Aprendizaje</h1>
+          <p class="welcome-description">
+            Responde 4 preguntas usando una escala Likert del 1 al 5. Tus respuestas
+            ayudarán a explorar distintas formas de aprender y los resultados se
+            consolidarán en tiempo real.
+          </p>
+          <button id="start-survey-btn" class="start-survey-button" type="button">
+            Comenzar encuesta
+          </button>
+        </div>
+
+        <div id="quizSection" class="quiz-content" hidden>
           <div class="intro-copy">
             <p class="eyebrow">ESCALA DE PREFERENCIAS</p>
             <h1 id="page-title">¿Cómo aprendes mejor?</h1>
@@ -70,7 +99,7 @@
           </div>
 
           <div class="question-area" aria-live="polite" aria-atomic="true">
-            <h2 id="questionText" class="question-title"></h2>
+            <h2 id="questionText" class="question-title" tabindex="-1"></h2>
             <div id="optionsList" class="options-list"></div>
           </div>
 

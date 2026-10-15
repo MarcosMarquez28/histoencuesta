@@ -19,6 +19,8 @@ const preguntas = [
 ];
 
 const TAMANO_PAGINA = 1000;
+const welcomeScreen = document.querySelector("#welcome-screen");
+const startSurveyButton = document.querySelector("#start-survey-btn");
 const quizSection = document.querySelector("#quizSection");
 const resultsSection = document.querySelector("#resultsSection");
 const questionText = document.querySelector("#questionText");
@@ -78,6 +80,14 @@ function renderizarPregunta() {
   const ultimaPregunta = preguntaActual === preguntas.length - 1;
   submitButton.hidden = !ultimaPregunta || !Number.isInteger(respuestas[preguntaActual]);
   quizStatus.textContent = "";
+}
+
+function comenzarEncuesta() {
+  welcomeScreen.hidden = true;
+  quizSection.hidden = false;
+  quizSection.classList.add("screen-enter");
+  renderizarPregunta();
+  questionText.focus();
 }
 
 function seleccionarOpcion(valor) {
@@ -354,6 +364,7 @@ function reiniciarEncuesta() {
 }
 
 submitButton.addEventListener("click", enviarRespuestas);
+startSurveyButton.addEventListener("click", comenzarEncuesta);
 showResultsButton.addEventListener("click", mostrarResultadosGlobales);
 refreshResultsButton.addEventListener("click", cargarResultadosGlobales);
 restartButton.addEventListener("click", reiniciarEncuesta);

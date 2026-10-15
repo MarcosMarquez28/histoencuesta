@@ -16,6 +16,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js" defer></script>
   </head>
@@ -73,6 +74,13 @@
             <div id="optionsList" class="options-list"></div>
           </div>
 
+          <div class="submission-area">
+            <p id="quizStatus" class="status-message" role="status" aria-live="polite"></p>
+            <button id="submitButton" class="submit-button" type="button" hidden>
+              Enviar respuestas
+            </button>
+          </div>
+
           <p class="privacy-note">
             <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <path
@@ -91,6 +99,9 @@
             </svg>
             Usa la misma escala de 1 a 5 para responder cada afirmación.
           </p>
+          <button id="showResultsButton" class="show-results-button" type="button">
+            Ver resultados globales
+          </button>
         </div>
 
         <section
@@ -100,8 +111,12 @@
           hidden
         >
           <p class="eyebrow">TU RESULTADO</p>
-          <h2 id="resultsTitle" class="results-title">Tu escala de respuestas</h2>
+          <h2 id="resultsTitle" class="results-title">Resultados globales</h2>
           <p id="resultText" class="result-description" aria-live="polite"></p>
+          <p id="participantCount" class="participant-count" aria-live="polite">
+            Respuestas registradas: cargando…
+          </p>
+          <p id="resultsStatus" class="status-message" role="status" aria-live="polite"></p>
 
           <div class="chart-panel">
             <canvas
@@ -111,21 +126,26 @@
             ></canvas>
           </div>
           <p class="chart-caption">
-            Porcentaje de respuestas en cada nivel de acuerdo.
+            Distribución de todas las respuestas registradas por nivel de acuerdo.
           </p>
 
-          <button id="restartButton" class="restart-button" type="button">
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path
-                d="M3.33 9.17A6.67 6.67 0 1 1 4.8 13.8M3.33 4.17v5h5"
-                stroke="currentColor"
-                stroke-width="1.6"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            Volver a empezar
-          </button>
+          <div class="results-actions">
+            <button id="refreshResultsButton" class="refresh-button" type="button">
+              Actualizar resultados
+            </button>
+            <button id="restartButton" class="restart-button" type="button">
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path
+                  d="M3.33 9.17A6.67 6.67 0 1 1 4.8 13.8M3.33 4.17v5h5"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Volver a empezar
+            </button>
+          </div>
         </section>
       </section>
 

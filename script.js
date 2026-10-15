@@ -1,3 +1,8 @@
+(() => {
+const SUPABASE_URL = "https://odxqegsvbonkgwxtdinz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_CovrCo9BVwkPTjqwI-0ySg_amF3TT6C";
+const supabase = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const escalaLikert = [
   { valor: 1, etiqueta: "Totalmente de acuerdo", color: "#78a9ff" },
   { valor: 2, etiqueta: "De acuerdo", color: "#4dd4ac" },
@@ -13,6 +18,7 @@ const preguntas = [
   "Aprendo mejor cuando puedo practicar y experimentar por mi cuenta.",
 ];
 
+const TAMANO_PAGINA = 1000;
 const quizSection = document.querySelector("#quizSection");
 const resultsSection = document.querySelector("#resultsSection");
 const questionText = document.querySelector("#questionText");
@@ -21,7 +27,13 @@ const progressText = document.querySelector("#progressText");
 const progressPercent = document.querySelector("#progressPercent");
 const progressBar = document.querySelector("#progressBar");
 const progressFill = document.querySelector("#progressFill");
+const quizStatus = document.querySelector("#quizStatus");
+const submitButton = document.querySelector("#submitButton");
+const showResultsButton = document.querySelector("#showResultsButton");
 const resultText = document.querySelector("#resultText");
+const participantCount = document.querySelector("#participantCount");
+const resultsStatus = document.querySelector("#resultsStatus");
+const refreshResultsButton = document.querySelector("#refreshResultsButton");
 const restartButton = document.querySelector("#restartButton");
 const chartCanvas = document.querySelector("#miGrafica");
 
@@ -47,6 +59,7 @@ function renderizarPregunta() {
     boton.className = "likert-button";
     boton.dataset.value = String(opcion.valor);
     boton.setAttribute("aria-label", `${opcion.valor}: ${opcion.etiqueta}`);
+    boton.setAttribute("aria-pressed", String(respuestas[preguntaActual] === opcion.valor));
     boton.addEventListener("click", () => seleccionarOpcion(opcion.valor));
 
     const valor = document.createElement("span");
@@ -61,44 +74,184 @@ function renderizarPregunta() {
     boton.append(valor, etiqueta);
     optionsList.append(boton);
   });
+
+  const ultimaPregunta = preguntaActual === preguntas.length - 1;
+  submitButton.hidden = !ultimaPregunta || !Number.isInteger(respuestas[preguntaActual]);
+  quizStatus.textContent = "";
 }
 
 function seleccionarOpcion(valor) {
-  respuestas.push(valor);
-  preguntaActual += 1;
+  respuestas[preguntaActual] = valor;
 
-  if (preguntaActual < preguntas.length) {
+  if (preguntaActual < preguntas.length - 1) {
+    preguntaActual += 1;
     renderizarPregunta();
     return;
   }
 
-  mostrarResultados();
+  renderizarPregunta();
+  optionsList.querySelectorAll(".likert-button").forEach((boton) => {
+    boton.setAttribute("aria-pressed", String(Number(boton.dataset.value) === valor));
+  });
+  submitButton.focus();
 }
 
-function mostrarResultados() {
-  const totalRespuestas = respuestas.length;
-  const resultados = escalaLikert.map((nivel) => {
-    const cantidad = respuestas.filter((respuesta) => respuesta === nivel.valor).length;
+async function enviarRespuestas() {
+  if (!respuestasCompletas()) {
+    quizStatus.textContent = "Responde todas las afirmaciones antes de enviar.";
+    return;
+  }
 
+  if (!supabase) {
+    quizStatus.textContent =
+      "No se pudo cargar Supabase. Comprueba tu conexión e inténtalo de nuevo.";
+    return;
+  }
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Enviando…";
+  quizStatus.textContent = "Guardando tus respuestas…";
+
+  try {
+    const { error } = await supabase
+      .from("respuestas")
+      .insert({ respuestas: [...respuestas] });
+
+    if (error) {
+      quizStatus.textContent = `No se pudieron guardar tus respuestas: ${error.message}`;
+      return;
+    }
+
+    await mostrarResultadosGlobales();
+  } catch (error) {
+    quizStatus.textContent =
+      `No se pudo completar el envío: ${obtenerMensajeError(error)}`;
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Enviar respuestas";
+  }
+}
+
+async function mostrarResultadosGlobales() {
+  quizSection.hidden = true;
+  resultsSection.hidden = false;
+  resultsStatus.textContent = "";
+  participantCount.textContent = "Respuestas registradas: cargando…";
+  await cargarResultadosGlobales();
+  refreshResultsButton.focus();
+}
+
+function respuestasCompletas() {
+  return (
+    respuestas.length === preguntas.length &&
+    respuestas.every((respuesta) =>
+      escalaLikert.some((opcion) => opcion.valor === respuesta),
+    )
+  );
+}
+
+async function cargarResultadosGlobales() {
+  if (!supabase) {
+    resultsStatus.textContent =
+      "No se pudo cargar Supabase. Comprueba tu conexión e inténtalo de nuevo.";
+    return;
+  }
+
+  refreshResultsButton.disabled = true;
+  refreshResultsButton.textContent = "Actualizando…";
+  resultsStatus.textContent = "Cargando resultados globales…";
+
+  try {
+    const filas = await consultarTodasLasRespuestas();
+    const resumen = calcularResumenGlobal(filas);
+
+    participantCount.textContent = `Respuestas registradas: ${resumen.participantes}`;
+    resultText.textContent =
+      `El ${formatearPorcentaje(resumen.porcentajeDeAcuerdo)} de todas las respuestas ` +
+      `expresa acuerdo (“De acuerdo” o “Totalmente de acuerdo”). ` +
+      `El promedio global es ${formatearNumero(resumen.promedio)} de 5 ` +
+      `(1 = totalmente de acuerdo).`;
+    resultsStatus.textContent = "";
+    renderizarGrafica(resumen.niveles);
+  } catch (error) {
+    resultsStatus.textContent =
+      `No se pudieron cargar los resultados globales: ${obtenerMensajeError(error)}`;
+  } finally {
+    refreshResultsButton.disabled = false;
+    refreshResultsButton.textContent = "Actualizar resultados";
+  }
+}
+
+async function consultarTodasLasRespuestas() {
+  const filas = [];
+
+  for (let desde = 0; ; desde += TAMANO_PAGINA) {
+    const hasta = desde + TAMANO_PAGINA - 1;
+    const { data, error } = await supabase
+      .from("respuestas")
+      .select("*")
+      .range(desde, hasta);
+
+    if (error) {
+      throw error;
+    }
+
+    if (!Array.isArray(data)) {
+      throw new Error("Supabase devolvió un formato de respuestas inesperado.");
+    }
+
+    filas.push(...data);
+    if (data.length < TAMANO_PAGINA) {
+      return filas;
+    }
+  }
+}
+
+function calcularResumenGlobal(filas) {
+  const cantidades = new Map(escalaLikert.map((nivel) => [nivel.valor, 0]));
+  let totalRespuestas = 0;
+  let sumaPuntuaciones = 0;
+  let respuestasDeAcuerdo = 0;
+
+  filas.forEach((fila, indice) => {
+    if (
+      !Array.isArray(fila.respuestas) ||
+      fila.respuestas.length !== preguntas.length ||
+      !fila.respuestas.every((valor) =>
+        escalaLikert.some((nivel) => nivel.valor === valor),
+      )
+    ) {
+      throw new Error(
+        `La fila ${indice + 1} no tiene un arreglo "respuestas" válido de ${preguntas.length} valores (1–5).`,
+      );
+    }
+
+    fila.respuestas.forEach((valor) => {
+      cantidades.set(valor, cantidades.get(valor) + 1);
+      totalRespuestas += 1;
+      sumaPuntuaciones += valor;
+      if (valor <= 2) {
+        respuestasDeAcuerdo += 1;
+      }
+    });
+  });
+
+  const niveles = escalaLikert.map((nivel) => {
+    const cantidad = cantidades.get(nivel.valor);
     return {
       ...nivel,
       cantidad,
-      porcentaje: (cantidad / totalRespuestas) * 100,
+      porcentaje: totalRespuestas === 0 ? 0 : (cantidad / totalRespuestas) * 100,
     };
   });
-  const respuestasDeAcuerdo = respuestas.filter((respuesta) => respuesta <= 2).length;
-  const porcentajeDeAcuerdo = (respuestasDeAcuerdo / totalRespuestas) * 100;
-  const promedio = respuestas.reduce((total, respuesta) => total + respuesta, 0) / totalRespuestas;
 
-  resultText.textContent =
-    `El ${formatearPorcentaje(porcentajeDeAcuerdo)} de tus respuestas expresa acuerdo ` +
-    `(“De acuerdo” o “Totalmente de acuerdo”). Tu puntuación promedio fue ` +
-    `${formatearNumero(promedio)} de 5 (1 = totalmente de acuerdo).`;
-
-  quizSection.hidden = true;
-  resultsSection.hidden = false;
-  renderizarGrafica(resultados);
-  restartButton.focus();
+  return {
+    participantes: filas.length,
+    niveles,
+    porcentajeDeAcuerdo:
+      totalRespuestas === 0 ? 0 : (respuestasDeAcuerdo / totalRespuestas) * 100,
+    promedio: totalRespuestas === 0 ? 0 : sumaPuntuaciones / totalRespuestas,
+  };
 }
 
 function renderizarGrafica(resultados) {
@@ -162,6 +315,18 @@ function renderizarGrafica(resultados) {
   });
 }
 
+function obtenerMensajeError(error) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (error && typeof error === "object" && "message" in error) {
+    return String(error.message);
+  }
+
+  return String(error);
+}
+
 function formatearPorcentaje(porcentaje) {
   return `${formatearNumero(porcentaje)} %`;
 }
@@ -180,11 +345,17 @@ function reiniciarEncuesta() {
 
   preguntaActual = 0;
   respuestas = [];
+  quizStatus.textContent = "";
+  resultsStatus.textContent = "";
   resultsSection.hidden = true;
   quizSection.hidden = false;
   renderizarPregunta();
   questionText.focus?.();
 }
 
+submitButton.addEventListener("click", enviarRespuestas);
+showResultsButton.addEventListener("click", mostrarResultadosGlobales);
+refreshResultsButton.addEventListener("click", cargarResultadosGlobales);
 restartButton.addEventListener("click", reiniciarEncuesta);
 renderizarPregunta();
+})();

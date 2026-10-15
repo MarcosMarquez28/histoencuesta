@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Explora tus preferencias de aprendizaje con esta escala Likert interactiva."
+    />
+    <meta name="theme-color" content="#0b1120" />
+    <title>Escala de preferencias de aprendizaje</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="quiz-card" aria-labelledby="page-title">
+        <header class="brand-header">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M4 19V5m0 14h16M8 15l3-4 3 2 5-7"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle cx="19" cy="6" r="1.5" fill="currentColor" />
+            </svg>
+          </div>
+          <span class="brand-name">MODO DE APRENDER</span>
+        </header>
+
+        <div id="quizSection" class="quiz-content">
+          <div class="intro-copy">
+            <p class="eyebrow">ESCALA DE PREFERENCIAS</p>
+            <h1 id="page-title">¿Cómo aprendes mejor?</h1>
+            <p class="intro-description">
+              Lee cada afirmación y elige cuánto estás de acuerdo. No hay
+              respuestas correctas o incorrectas.
+            </p>
+          </div>
+
+          <div
+            class="progress-meta"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span id="progressText">Pregunta 1 de 4</span>
+            <span id="progressPercent">25 %</span>
+          </div>
+          <div
+            class="progress-track"
+            role="progressbar"
+            aria-label="Progreso del quiz"
+            aria-valuemin="0"
+            aria-valuemax="4"
+            aria-valuenow="1"
+            id="progressBar"
+          >
+            <span id="progressFill" class="progress-fill"></span>
+          </div>
+
+          <div class="question-area" aria-live="polite" aria-atomic="true">
+            <h2 id="questionText" class="question-title"></h2>
+            <div id="optionsList" class="options-list"></div>
+          </div>
+
+          <p class="privacy-note">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="M10 2.5 3.75 5v4.25c0 4.1 2.67 7.93 6.25 8.75 3.58-.82 6.25-4.65 6.25-8.75V5L10 2.5Z"
+                stroke="currentColor"
+                stroke-width="1.4"
+                stroke-linejoin="round"
+              />
+              <path
+                d="m7.5 10 1.67 1.67L12.92 8"
+                stroke="currentColor"
+                stroke-width="1.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Usa la misma escala de 1 a 5 para responder cada afirmación.
+          </p>
+        </div>
+
+        <section
+          id="resultsSection"
+          class="results-content"
+          aria-labelledby="resultsTitle"
+          hidden
+        >
+          <p class="eyebrow">TU RESULTADO</p>
+          <h2 id="resultsTitle" class="results-title">Tu escala de respuestas</h2>
+          <p id="resultText" class="result-description" aria-live="polite"></p>
+
+          <div class="chart-panel">
+            <canvas
+              id="miGrafica"
+              role="img"
+              aria-label="Porcentaje de respuestas en cada nivel de la escala Likert"
+            ></canvas>
+          </div>
+          <p class="chart-caption">
+            Porcentaje de respuestas en cada nivel de acuerdo.
+          </p>
+
+          <button id="restartButton" class="restart-button" type="button">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="M3.33 9.17A6.67 6.67 0 1 1 4.8 13.8M3.33 4.17v5h5"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Volver a empezar
+          </button>
+        </section>
+      </section>
+
+      <footer class="page-footer">
+        <span>Una pausa para descubrir cómo piensas.</span>
+      </footer>
+    </main>
+  </body>
+</html>

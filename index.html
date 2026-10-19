@@ -57,11 +57,30 @@
             </svg>
           </div>
           <p class="eyebrow">UNA PAUSA PARA DESCUBRIR</p>
-          <h1 id="welcome-title">Encuesta sobre Histología II y el sistema digestivo</h1>
-          <p class="welcome-description">
-            Responde 12 preguntas usando una escala Likert del 1 al 5. Tus respuestas
-            ayudarán a conocer tu experiencia con el estudio del sistema digestivo y
-            los resultados se consolidarán en tiempo real.
+          <div class="test-switch" role="group" aria-label="Seleccionar tipo de cuestionario">
+            <button
+              id="preTestButton"
+              class="test-switch-button"
+              type="button"
+              data-test-type="pre"
+              aria-pressed="true"
+            >
+              Pre-Test
+            </button>
+            <button
+              id="postTestButton"
+              class="test-switch-button"
+              type="button"
+              data-test-type="post"
+              aria-pressed="false"
+            >
+              Post-Test
+            </button>
+          </div>
+          <h1 id="welcome-title">Encuesta sobre Histología II - Pre-Test</h1>
+          <p id="welcome-description" class="welcome-description">
+            Responde las 12 preguntas del Pre-Test sobre Histología II y el sistema
+            digestivo usando una escala Likert del 1 al 5.
           </p>
           <button id="start-survey-btn" class="start-survey-button" type="button">
             Comenzar encuesta
@@ -70,7 +89,7 @@
 
         <div id="quizSection" class="quiz-content" hidden>
           <div class="intro-copy">
-            <p class="eyebrow">ENCUESTA DE HISTOLOGÍA II</p>
+            <p id="quiz-eyebrow" class="eyebrow">ENCUESTA DE HISTOLOGÍA II · PRE-TEST</p>
             <h1 id="page-title">Sistema digestivo</h1>
             <p class="intro-description">
               Lee cada pregunta y elige cuánto estás de acuerdo. No hay
@@ -139,8 +158,8 @@
           aria-labelledby="resultsTitle"
           hidden
         >
-          <p class="eyebrow">RESULTADOS DE LA ENCUESTA</p>
-          <h2 id="resultsTitle" class="results-title">Resultados globales</h2>
+          <p id="results-eyebrow" class="eyebrow">RESULTADOS DE LA ENCUESTA · PRE-TEST</p>
+          <h2 id="resultsTitle" class="results-title">Resultados globales · Pre-Test</h2>
           <p id="resultText" class="result-description" aria-live="polite"></p>
           <p id="participantCount" class="participant-count" aria-live="polite">
             Total de participantes: cargando…

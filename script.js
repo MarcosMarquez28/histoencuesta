@@ -11,7 +11,7 @@ const escalaLikert = [
   { valor: 5, etiqueta: "Totalmente en desacuerdo", color: "#fb7185" },
 ];
 
-const preguntas = [
+const preguntasPreTest = [
   "¿Considera usted que puede reconocer las características histológicas de los órganos del sistema digestivo?",
   "¿Considera usted que puede distinguir microscópicamente la capa mucosa de la submucosa?",
   "¿Considera usted que puede identificar las células de Paneth en una microfotografía histológica del intestino delgado específicamente en el yeyuno?",
@@ -26,13 +26,25 @@ const preguntas = [
   "¿Considera usted que domina los conceptos teóricos requeridos para comprender las prácticas del sistema digestivo?",
 ];
 
+const preguntasPostTest = [...preguntasPreTest];
+const pruebas = {
+  pre: { nombre: "Pre-Test", preguntas: preguntasPreTest },
+  post: { nombre: "Post-Test", preguntas: preguntasPostTest },
+};
 const PREGUNTAS_VERSION_ANTERIOR = 4;
 const TAMANO_PAGINA = 1000;
 const welcomeScreen = document.querySelector("#welcome-screen");
 const startSurveyButton = document.querySelector("#start-survey-btn");
+const testSwitchButtons = document.querySelectorAll(".test-switch-button");
+const welcomeTitle = document.querySelector("#welcome-title");
+const welcomeDescription = document.querySelector("#welcome-description");
 const quizCard = document.querySelector(".quiz-card");
 const quizSection = document.querySelector("#quizSection");
 const resultsSection = document.querySelector("#resultsSection");
+const quizEyebrow = document.querySelector("#quiz-eyebrow");
+const resultsEyebrow = document.querySelector("#results-eyebrow");
+const resultsTitle = document.querySelector("#resultsTitle");
+const pageTitle = document.querySelector("#page-title");
 const questionText = document.querySelector("#questionText");
 const optionsList = document.querySelector("#optionsList");
 const progressText = document.querySelector("#progressText");
@@ -51,6 +63,33 @@ const restartButton = document.querySelector("#restartButton");
 
 let preguntaActual = 0;
 let respuestas = [];
+let tipoPruebaActiva = "pre";
+let preguntas = preguntasPreTest;
+
+function seleccionarTipoPrueba(tipo) {
+  if (!Object.hasOwn(pruebas, tipo)) {
+    throw new Error(`Tipo de prueba no válido: ${tipo}`);
+  }
+
+  tipoPruebaActiva = tipo;
+  preguntas = pruebas[tipo].preguntas;
+  testSwitchButtons.forEach((boton) => {
+    boton.setAttribute("aria-pressed", String(boton.dataset.testType === tipo));
+  });
+
+  const nombrePrueba = pruebas[tipo].nombre;
+  const tituloPrueba = `Encuesta sobre Histología II - ${nombrePrueba}`;
+  welcomeTitle.textContent = tituloPrueba;
+  document.title = tituloPrueba;
+  welcomeDescription.textContent =
+    `Responde las 12 preguntas del ${nombrePrueba} sobre Histología II y el ` +
+    "sistema digestivo usando una escala Likert del 1 al 5.";
+  quizEyebrow.textContent = `ENCUESTA DE HISTOLOGÍA II · ${nombrePrueba.toUpperCase()}`;
+  pageTitle.textContent = `Sistema digestivo · ${nombrePrueba}`;
+  resultsEyebrow.textContent =
+    `RESULTADOS DE LA ENCUESTA · ${nombrePrueba.toUpperCase()}`;
+  resultsTitle.textContent = `Resultados globales · ${nombrePrueba}`;
+}
 
 function renderizarPregunta() {
   const numeroPregunta = preguntaActual + 1;
@@ -136,7 +175,7 @@ async function enviarRespuestas() {
   try {
     const { error } = await supabase
       .from("respuestas")
-      .insert({ respuestas: [...respuestas] });
+      .insert([{ respuestas: [...respuestas], tipo: tipoPruebaActiva }]);
 
     if (error) {
       quizStatus.textContent = `No se pudieron guardar tus respuestas: ${error.message}`;
@@ -213,6 +252,7 @@ async function consultarTodasLasRespuestas() {
     const { data, error } = await supabase
       .from("respuestas")
       .select("*")
+      .eq("tipo", tipoPruebaActiva)
       .range(desde, hasta);
 
     if (error) {
@@ -380,5 +420,11 @@ startSurveyButton.addEventListener("click", comenzarEncuesta);
 showResultsButton.addEventListener("click", mostrarResultadosGlobales);
 refreshResultsButton.addEventListener("click", cargarResultadosGlobales);
 restartButton.addEventListener("click", reiniciarEncuesta);
+testSwitchButtons.forEach((boton) => {
+  boton.addEventListener("click", () =>
+    seleccionarTipoPrueba(boton.dataset.testType),
+  );
+});
+seleccionarTipoPrueba(tipoPruebaActiva);
 renderizarPregunta();
 })();

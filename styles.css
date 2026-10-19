@@ -122,6 +122,56 @@ button {
   margin-bottom: 12px;
 }
 
+.test-switch {
+  display: grid;
+  width: min(100%, 330px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  margin: 0 auto 21px;
+  padding: 5px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 13px;
+  background: rgba(7, 13, 24, 0.72);
+}
+
+.test-switch-button {
+  min-height: 42px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.test-switch-button[aria-pressed="true"] {
+  border-color: rgba(151, 190, 255, 0.55);
+  color: #f5f8ff;
+  background: linear-gradient(135deg, #6499f4, #477fe2);
+  box-shadow: 0 5px 16px rgba(67, 124, 222, 0.22);
+}
+
+.test-switch-button:not([aria-pressed="true"]):hover {
+  color: #dce6f5;
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.test-switch-button:active {
+  transform: scale(0.98);
+}
+
+.test-switch-button:focus-visible {
+  outline: 3px solid rgba(116, 167, 255, 0.75);
+  outline-offset: 3px;
+}
+
 .welcome-content h1 {
   margin-bottom: 16px;
   font-family: Manrope, sans-serif;
@@ -679,6 +729,10 @@ h1,
   }
 
   .start-survey-button {
+    width: 100%;
+  }
+
+  .test-switch {
     width: 100%;
   }
 

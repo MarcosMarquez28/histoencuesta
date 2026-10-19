@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Explora tus preferencias de aprendizaje con esta escala Likert interactiva."
+      content="Comparte tu experiencia de aprendizaje en Histología II y el sistema digestivo."
     />
     <meta name="theme-color" content="#0b1120" />
-    <title>Escala de preferencias de aprendizaje</title>
+    <title>Encuesta de Histología II | Sistema digestivo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,7 +22,7 @@
   </head>
   <body>
     <main class="page-shell">
-      <section class="quiz-card" aria-label="Encuesta sobre métodos de aprendizaje">
+      <section class="quiz-card" aria-label="Encuesta sobre Histología II y el sistema digestivo">
         <header class="brand-header">
           <div class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
@@ -57,11 +57,11 @@
             </svg>
           </div>
           <p class="eyebrow">UNA PAUSA PARA DESCUBRIR</p>
-          <h1 id="welcome-title">Bienvenido a la Encuesta sobre Métodos de Aprendizaje</h1>
+          <h1 id="welcome-title">Encuesta sobre Histología II y el sistema digestivo</h1>
           <p class="welcome-description">
-            Responde 4 preguntas usando una escala Likert del 1 al 5. Tus respuestas
-            ayudarán a explorar distintas formas de aprender y los resultados se
-            consolidarán en tiempo real.
+            Responde 12 preguntas usando una escala Likert del 1 al 5. Tus respuestas
+            ayudarán a conocer tu experiencia con el estudio del sistema digestivo y
+            los resultados se consolidarán en tiempo real.
           </p>
           <button id="start-survey-btn" class="start-survey-button" type="button">
             Comenzar encuesta
@@ -70,10 +70,10 @@
 
         <div id="quizSection" class="quiz-content" hidden>
           <div class="intro-copy">
-            <p class="eyebrow">ESCALA DE PREFERENCIAS</p>
-            <h1 id="page-title">¿Cómo aprendes mejor?</h1>
+            <p class="eyebrow">ENCUESTA DE HISTOLOGÍA II</p>
+            <h1 id="page-title">Sistema digestivo</h1>
             <p class="intro-description">
-              Lee cada afirmación y elige cuánto estás de acuerdo. No hay
+              Lee cada pregunta y elige cuánto estás de acuerdo. No hay
               respuestas correctas o incorrectas.
             </p>
           </div>
@@ -83,16 +83,16 @@
             aria-live="polite"
             aria-atomic="true"
           >
-            <span id="progressText">Pregunta 1 de 4</span>
-            <span id="progressPercent">25 %</span>
+            <span id="progressText">Pregunta 1 de 12</span>
+            <span id="progressPercent">0 %</span>
           </div>
           <div
             class="progress-track"
             role="progressbar"
             aria-label="Progreso del quiz"
             aria-valuemin="0"
-            aria-valuemax="4"
-            aria-valuenow="1"
+            aria-valuemax="100"
+            aria-valuenow="0"
             id="progressBar"
           >
             <span id="progressFill" class="progress-fill"></span>
@@ -126,7 +126,7 @@
                 stroke-linejoin="round"
               />
             </svg>
-            Usa la misma escala de 1 a 5 para responder cada afirmación.
+            Usa la misma escala de 1 a 5 para responder cada pregunta.
           </p>
           <button id="showResultsButton" class="show-results-button" type="button">
             Ver resultados globales
@@ -147,7 +147,14 @@
           </p>
           <p id="resultsStatus" class="status-message" role="status" aria-live="polite"></p>
 
-          <div id="results-list" class="results-list" aria-live="polite"></div>
+          <div
+            id="results-list"
+            class="results-list"
+            role="region"
+            aria-label="Resultados por pregunta"
+            aria-live="polite"
+            tabindex="0"
+          ></div>
 
           <div class="results-actions">
             <button id="refreshResultsButton" class="refresh-button" type="button">
@@ -170,7 +177,7 @@
       </section>
 
       <footer class="page-footer">
-        <span>Una pausa para descubrir cómo piensas.</span>
+        <span>Una pausa para explorar el sistema digestivo.</span>
       </footer>
     </main>
   </body>

@@ -476,7 +476,36 @@ h1,
 .results-list {
   display: grid;
   gap: 14px;
+  max-height: min(72vh, 780px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   margin: 24px 0 26px;
+  padding: 2px 8px 2px 0;
+  scroll-behavior: smooth;
+  scrollbar-color: rgba(116, 167, 255, 0.45) rgba(148, 163, 184, 0.08);
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.results-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.results-list::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.results-list::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(116, 167, 255, 0.45);
+  background-clip: padding-box;
+}
+
+.results-list:focus-visible {
+  outline: 2px solid rgba(116, 167, 255, 0.65);
+  outline-offset: 3px;
 }
 
 .result-question {

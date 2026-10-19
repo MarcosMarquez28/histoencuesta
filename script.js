@@ -12,12 +12,21 @@ const escalaLikert = [
 ];
 
 const preguntas = [
-  "Aprendo mejor cuando la información se presenta con imágenes, diagramas o videos.",
-  "Me resulta útil escuchar explicaciones y conversar sobre lo que estoy aprendiendo.",
-  "Comprendo mejor un tema cuando leo sobre él y tomo apuntes.",
-  "Aprendo mejor cuando puedo practicar y experimentar por mi cuenta.",
+  "¿Considera usted que puede reconocer las características histológicas de los órganos del sistema digestivo?",
+  "¿Considera usted que puede distinguir microscópicamente la capa mucosa de la submucosa?",
+  "¿Considera usted que puede identificar las células de Paneth en una microfotografía histológica del intestino delgado específicamente en el yeyuno?",
+  "¿Considera usted que la zona de transición epitelial esofagogástrica es compleja de identificar?",
+  "¿Considera usted que los materiales anteriores le brindan suficientes pautas para el estudio autónomo de la asignatura Histología II?",
+  "¿Suele usted apoyarse en herramientas digitales para preparar las prácticas de Histología del sistema digestivo?",
+  "¿Usa usted un método de estudio que integre de forma estructurada esquemas teóricos, microfotografías con sus aumentos y textos explicativos?",
+  "¿Puede usted revisar cómodamente microfotografías de láminas histológicas desde cualquier dispositivo?",
+  "¿Considera usted que un recurso adicional le serviría como complemento para su aprendizaje en las prácticas del sistema digestivo?",
+  "¿Considera usted que domina el uso de herramientas e interfaces digitales interactivas aplicadas al aprendizaje de la histología?",
+  "¿Aplica usted un método ordenado para explorar y analizar los preparados del sistema digestivo?",
+  "¿Considera usted que domina los conceptos teóricos requeridos para comprender las prácticas del sistema digestivo?",
 ];
 
+const PREGUNTAS_VERSION_ANTERIOR = 4;
 const TAMANO_PAGINA = 1000;
 const welcomeScreen = document.querySelector("#welcome-screen");
 const startSurveyButton = document.querySelector("#start-survey-btn");
@@ -45,13 +54,15 @@ let respuestas = [];
 
 function renderizarPregunta() {
   const numeroPregunta = preguntaActual + 1;
-  const porcentaje = Math.round((numeroPregunta / preguntas.length) * 100);
+  const porcentaje = Math.round(
+    (preguntaActual / (preguntas.length - 1)) * 100,
+  );
 
   questionText.textContent = preguntas[preguntaActual];
   progressText.textContent = `Pregunta ${numeroPregunta} de ${preguntas.length}`;
   progressPercent.textContent = `${porcentaje} %`;
-  progressBar.setAttribute("aria-valuemax", String(preguntas.length));
-  progressBar.setAttribute("aria-valuenow", String(numeroPregunta));
+  progressBar.setAttribute("aria-valuemax", "100");
+  progressBar.setAttribute("aria-valuenow", String(porcentaje));
   progressFill.style.width = `${porcentaje}%`;
   optionsList.replaceChildren();
 
@@ -108,7 +119,7 @@ function seleccionarOpcion(valor) {
 
 async function enviarRespuestas() {
   if (!respuestasCompletas()) {
-    quizStatus.textContent = "Responde todas las afirmaciones antes de enviar.";
+    quizStatus.textContent = "Responde todas las preguntas antes de enviar.";
     return;
   }
 
@@ -177,8 +188,13 @@ async function cargarResultadosGlobales() {
     const resumen = calcularResumenPorPregunta(filas);
 
     participantCount.textContent = `Total de participantes: ${resumen.participantes}`;
-    resultText.textContent = "Distribución de respuestas para cada afirmación:";
-    resultsStatus.textContent = "";
+    resultText.textContent = "Distribución de respuestas para cada pregunta:";
+    resultsStatus.textContent =
+      resumen.respuestasAnteriores > 0
+        ? `Se excluyeron ${resumen.respuestasAnteriores} ${
+            resumen.respuestasAnteriores === 1 ? "respuesta" : "respuestas"
+          } de la versión anterior de 4 preguntas, que no se pueden comparar con este cuestionario.`
+        : "";
     renderizarResultados(resumen.preguntas, resumen.participantes);
   } catch (error) {
     resultsStatus.textContent =
@@ -218,8 +234,21 @@ function calcularResumenPorPregunta(filas) {
   const cantidades = preguntas.map(
     () => new Map(escalaLikert.map((nivel) => [nivel.valor, 0])),
   );
+  let participantes = 0;
+  let respuestasAnteriores = 0;
 
   filas.forEach((fila, indice) => {
+    if (
+      Array.isArray(fila.respuestas) &&
+      fila.respuestas.length === PREGUNTAS_VERSION_ANTERIOR &&
+      fila.respuestas.every((valor) =>
+        escalaLikert.some((nivel) => nivel.valor === valor),
+      )
+    ) {
+      respuestasAnteriores += 1;
+      return;
+    }
+
     if (
       !Array.isArray(fila.respuestas) ||
       fila.respuestas.length !== preguntas.length ||
@@ -232,6 +261,7 @@ function calcularResumenPorPregunta(filas) {
       );
     }
 
+    participantes += 1;
     fila.respuestas.forEach((valor, pregunta) => {
       cantidades[pregunta].set(
         valor,
@@ -241,7 +271,8 @@ function calcularResumenPorPregunta(filas) {
   });
 
   return {
-    participantes: filas.length,
+    participantes,
+    respuestasAnteriores,
     preguntas: cantidades.map((conteos) =>
       escalaLikert.map((nivel) => ({
         ...nivel,

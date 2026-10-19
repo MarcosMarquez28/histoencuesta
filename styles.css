@@ -386,7 +386,8 @@ h1,
 }
 
 .likert-button:focus-visible,
-.restart-button:focus-visible {
+.restart-button:focus-visible,
+.back-to-top-button:focus-visible {
   outline: 3px solid var(--likert-color, rgba(116, 167, 255, 0.75));
   outline-offset: 3px;
 }
@@ -449,7 +450,8 @@ h1,
 
 .submit-button,
 .refresh-button,
-.show-results-button {
+.show-results-button,
+.back-to-top-button {
   min-height: 46px;
   padding: 0 18px;
   border: 1px solid rgba(116, 167, 255, 0.38);
@@ -468,7 +470,8 @@ h1,
 
 .submit-button:hover:not(:disabled),
 .refresh-button:hover:not(:disabled),
-.show-results-button:hover:not(:disabled) {
+.show-results-button:hover:not(:disabled),
+.back-to-top-button:hover {
   transform: translateY(-1px);
   border-color: rgba(116, 167, 255, 0.7);
   background: rgba(116, 167, 255, 0.23);
@@ -650,6 +653,19 @@ h1,
   transform: translateY(-1px);
   border-color: rgba(116, 167, 255, 0.65);
   background: rgba(116, 167, 255, 0.2);
+}
+
+.back-to-top-button {
+  color: #cbd5e1;
+  border-color: rgba(148, 163, 184, 0.25);
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.back-to-top-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(116, 167, 255, 0.58);
+  color: #e5efff;
+  background: rgba(116, 167, 255, 0.14);
 }
 
 .restart-button:active {

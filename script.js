@@ -26,7 +26,20 @@ const preguntasPreTest = [
   "¿Considera usted que domina los conceptos teóricos requeridos para comprender las prácticas del sistema digestivo?",
 ];
 
-const preguntasPostTest = [...preguntasPreTest];
+const preguntasPostTest = [
+  "¿Considera usted que la guía digital le permitió identificar con precisión los órganos digestivos presentados?",
+  "¿Considera usted que la guía le permitió reconocer sistemáticamente las cuatro capas tisulares digestivas?",
+  "¿Considera usted que la guía le facilitó reconocer con precisión las células de Paneth y diferenciarlas de otras células del epitelio intestinal?",
+  "¿Considera usted que la guía le facilitó localizar el cambio de epitelio en las zonas de transición?",
+  "¿La guía digital le proporcionó pautas claras para orientar su estudio autónomo de la asignatura Histología II?",
+  "¿Considera usted que la guía digital le ayuda a preparar las actividades prácticas de la asignatura?",
+  "¿La organización visual de la guía digital (esquemas, aumentos y descripciones) le permitió seguir una secuencia clara para interpretar el sistema digestivo?",
+  "¿Considera usted que acceder a la guía digital desde diferentes dispositivos o computadoras es cómodo para su estudio autónomo?",
+  "¿Considera usted que la guía digital fue el recurso adicional adecuado para consolidar su aprendizaje en las prácticas del sistema digestivo?",
+  "¿Considera usted que la interactividad ofrecida por la guía digital le facilitó el análisis detallado de los tejidos del sistema digestivo?",
+  "¿Considera usted que la guía digital facilitó su método para explorar y analizar los preparados del sistema digestivo?",
+  "¿Considera usted que la guía digital contribuyó a dominar los conceptos teóricos requeridos para comprender las prácticas del sistema digestivo?",
+];
 const pruebas = {
   pre: { nombre: "Pre-Test", preguntas: preguntasPreTest },
   post: { nombre: "Post-Test", preguntas: preguntasPostTest },
@@ -60,6 +73,7 @@ const resultsStatus = document.querySelector("#resultsStatus");
 const resultsList = document.querySelector("#results-list");
 const refreshResultsButton = document.querySelector("#refreshResultsButton");
 const restartButton = document.querySelector("#restartButton");
+const backToTopButton = document.querySelector("#backToTopButton");
 
 let preguntaActual = 0;
 let respuestas = [];
@@ -415,11 +429,29 @@ function reiniciarEncuesta() {
   questionText.focus?.();
 }
 
+function volverAlInicio() {
+  preguntaActual = 0;
+  respuestas = [];
+  quizCard.classList.remove("results-active");
+  quizStatus.textContent = "";
+  resultsStatus.textContent = "";
+  resultsSection.hidden = true;
+  quizSection.hidden = true;
+  welcomeScreen.hidden = false;
+  renderizarPregunta();
+  resultsList.scrollTop = 0;
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
 submitButton.addEventListener("click", enviarRespuestas);
 startSurveyButton.addEventListener("click", comenzarEncuesta);
 showResultsButton.addEventListener("click", mostrarResultadosGlobales);
 refreshResultsButton.addEventListener("click", cargarResultadosGlobales);
 restartButton.addEventListener("click", reiniciarEncuesta);
+backToTopButton.addEventListener("click", (event) => {
+  event.preventDefault();
+  volverAlInicio();
+});
 testSwitchButtons.forEach((boton) => {
   boton.addEventListener("click", () =>
     seleccionarTipoPrueba(boton.dataset.testType),

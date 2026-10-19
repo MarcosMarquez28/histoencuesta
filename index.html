@@ -17,7 +17,6 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js" defer></script>
   </head>
   <body>
@@ -139,24 +138,15 @@
           aria-labelledby="resultsTitle"
           hidden
         >
-          <p class="eyebrow">TU RESULTADO</p>
+          <p class="eyebrow">RESULTADOS DE LA ENCUESTA</p>
           <h2 id="resultsTitle" class="results-title">Resultados globales</h2>
           <p id="resultText" class="result-description" aria-live="polite"></p>
           <p id="participantCount" class="participant-count" aria-live="polite">
-            Respuestas registradas: cargando…
+            Total de participantes: cargando…
           </p>
           <p id="resultsStatus" class="status-message" role="status" aria-live="polite"></p>
 
-          <div class="chart-panel">
-            <canvas
-              id="miGrafica"
-              role="img"
-              aria-label="Porcentaje de respuestas en cada nivel de la escala Likert"
-            ></canvas>
-          </div>
-          <p class="chart-caption">
-            Distribución de todas las respuestas registradas por nivel de acuerdo.
-          </p>
+          <div id="results-list" class="results-list" aria-live="polite"></div>
 
           <div class="results-actions">
             <button id="refreshResultsButton" class="refresh-button" type="button">

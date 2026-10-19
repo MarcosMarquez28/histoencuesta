@@ -21,6 +21,7 @@ const preguntas = [
 const TAMANO_PAGINA = 1000;
 const welcomeScreen = document.querySelector("#welcome-screen");
 const startSurveyButton = document.querySelector("#start-survey-btn");
+const quizCard = document.querySelector(".quiz-card");
 const quizSection = document.querySelector("#quizSection");
 const resultsSection = document.querySelector("#resultsSection");
 const questionText = document.querySelector("#questionText");
@@ -35,13 +36,12 @@ const showResultsButton = document.querySelector("#showResultsButton");
 const resultText = document.querySelector("#resultText");
 const participantCount = document.querySelector("#participantCount");
 const resultsStatus = document.querySelector("#resultsStatus");
+const resultsList = document.querySelector("#results-list");
 const refreshResultsButton = document.querySelector("#refreshResultsButton");
 const restartButton = document.querySelector("#restartButton");
-const chartCanvas = document.querySelector("#miGrafica");
 
 let preguntaActual = 0;
 let respuestas = [];
-let grafica = null;
 
 function renderizarPregunta() {
   const numeroPregunta = preguntaActual + 1;
@@ -145,8 +145,9 @@ async function enviarRespuestas() {
 async function mostrarResultadosGlobales() {
   quizSection.hidden = true;
   resultsSection.hidden = false;
+  quizCard.classList.add("results-active");
   resultsStatus.textContent = "";
-  participantCount.textContent = "Respuestas registradas: cargando…";
+  participantCount.textContent = "Total de participantes: cargando…";
   await cargarResultadosGlobales();
   refreshResultsButton.focus();
 }
@@ -173,16 +174,12 @@ async function cargarResultadosGlobales() {
 
   try {
     const filas = await consultarTodasLasRespuestas();
-    const resumen = calcularResumenGlobal(filas);
+    const resumen = calcularResumenPorPregunta(filas);
 
-    participantCount.textContent = `Respuestas registradas: ${resumen.participantes}`;
-    resultText.textContent =
-      `El ${formatearPorcentaje(resumen.porcentajeDeAcuerdo)} de todas las respuestas ` +
-      `expresa acuerdo (“De acuerdo” o “Totalmente de acuerdo”). ` +
-      `El promedio global es ${formatearNumero(resumen.promedio)} de 5 ` +
-      `(1 = totalmente de acuerdo).`;
+    participantCount.textContent = `Total de participantes: ${resumen.participantes}`;
+    resultText.textContent = "Distribución de respuestas para cada afirmación:";
     resultsStatus.textContent = "";
-    renderizarGrafica(resumen.niveles);
+    renderizarResultados(resumen.preguntas, resumen.participantes);
   } catch (error) {
     resultsStatus.textContent =
       `No se pudieron cargar los resultados globales: ${obtenerMensajeError(error)}`;
@@ -217,11 +214,10 @@ async function consultarTodasLasRespuestas() {
   }
 }
 
-function calcularResumenGlobal(filas) {
-  const cantidades = new Map(escalaLikert.map((nivel) => [nivel.valor, 0]));
-  let totalRespuestas = 0;
-  let sumaPuntuaciones = 0;
-  let respuestasDeAcuerdo = 0;
+function calcularResumenPorPregunta(filas) {
+  const cantidades = preguntas.map(
+    () => new Map(escalaLikert.map((nivel) => [nivel.valor, 0])),
+  );
 
   filas.forEach((fila, indice) => {
     if (
@@ -236,92 +232,81 @@ function calcularResumenGlobal(filas) {
       );
     }
 
-    fila.respuestas.forEach((valor) => {
-      cantidades.set(valor, cantidades.get(valor) + 1);
-      totalRespuestas += 1;
-      sumaPuntuaciones += valor;
-      if (valor <= 2) {
-        respuestasDeAcuerdo += 1;
-      }
+    fila.respuestas.forEach((valor, pregunta) => {
+      cantidades[pregunta].set(
+        valor,
+        cantidades[pregunta].get(valor) + 1,
+      );
     });
-  });
-
-  const niveles = escalaLikert.map((nivel) => {
-    const cantidad = cantidades.get(nivel.valor);
-    return {
-      ...nivel,
-      cantidad,
-      porcentaje: totalRespuestas === 0 ? 0 : (cantidad / totalRespuestas) * 100,
-    };
   });
 
   return {
     participantes: filas.length,
-    niveles,
-    porcentajeDeAcuerdo:
-      totalRespuestas === 0 ? 0 : (respuestasDeAcuerdo / totalRespuestas) * 100,
-    promedio: totalRespuestas === 0 ? 0 : sumaPuntuaciones / totalRespuestas,
+    preguntas: cantidades.map((conteos) =>
+      escalaLikert.map((nivel) => ({
+        ...nivel,
+        cantidad: conteos.get(nivel.valor),
+      })),
+    ),
   };
 }
 
-function renderizarGrafica(resultados) {
-  if (typeof Chart === "undefined") {
-    throw new Error("No se pudo cargar Chart.js. Comprueba tu conexión e inténtalo de nuevo.");
-  }
+function renderizarResultados(resultadosPorPregunta, participantes) {
+  resultsList.replaceChildren();
 
-  if (grafica) {
-    grafica.destroy();
-  }
+  resultadosPorPregunta.forEach((resultados, indicePregunta) => {
+    const tarjeta = document.createElement("article");
+    tarjeta.className = "result-question";
 
-  grafica = new Chart(chartCanvas, {
-    type: "doughnut",
-    data: {
-      labels: resultados.map((resultado) => resultado.etiqueta),
-      datasets: [
-        {
-          data: resultados.map((resultado) => resultado.porcentaje),
-          backgroundColor: resultados.map((resultado) => resultado.color),
-          borderColor: "#111a2b",
-          borderWidth: 4,
-          hoverOffset: 7,
-        },
-      ],
-    },
-    options: {
-      maintainAspectRatio: false,
-      cutout: "66%",
-      animation: { duration: 650 },
-      plugins: {
-        legend: {
-          position: "bottom",
-          labels: {
-            padding: 16,
-            usePointStyle: true,
-            pointStyle: "circle",
-            font: { family: "DM Sans", size: 12 },
-            generateLabels(chart) {
-              const dataset = chart.data.datasets[0];
-              return chart.data.labels.map((etiqueta, indice) => ({
-                text: `${etiqueta}: ${formatearPorcentaje(dataset.data[indice])}`,
-                fontColor: dataset.backgroundColor[indice],
-                fillStyle: dataset.backgroundColor[indice],
-                strokeStyle: dataset.backgroundColor[indice],
-                lineWidth: 0,
-                hidden: false,
-                index: indice,
-              }));
-            },
-          },
-        },
-        tooltip: {
-          callbacks: {
-            label(context) {
-              return ` ${context.label}: ${formatearPorcentaje(context.raw)}`;
-            },
-          },
-        },
-      },
-    },
+    const encabezado = document.createElement("h3");
+    encabezado.className = "result-question-title";
+    encabezado.textContent = `${indicePregunta + 1}. ${preguntas[indicePregunta]}`;
+
+    const barras = document.createElement("div");
+    barras.className = "result-bars";
+
+    resultados.forEach((resultado) => {
+      const porcentaje =
+        participantes === 0 ? 0 : (resultado.cantidad / participantes) * 100;
+      const fila = document.createElement("div");
+      fila.className = "result-bar-row";
+      fila.style.setProperty("--bar-color", resultado.color);
+
+      const etiqueta = document.createElement("span");
+      etiqueta.className = "result-bar-label";
+      etiqueta.textContent = `${resultado.valor}. ${resultado.etiqueta}`;
+
+      const pista = document.createElement("div");
+      pista.className = "result-bar-track";
+      pista.setAttribute("role", "progressbar");
+      pista.setAttribute(
+        "aria-label",
+        `${resultado.etiqueta}: ${resultado.cantidad} ${
+          resultado.cantidad === 1 ? "persona" : "personas"
+        }`,
+      );
+      pista.setAttribute("aria-valuemin", "0");
+      pista.setAttribute("aria-valuemax", String(participantes));
+      pista.setAttribute("aria-valuenow", String(resultado.cantidad));
+
+      const relleno = document.createElement("span");
+      relleno.className = "result-bar-fill";
+      relleno.style.width = `${porcentaje}%`;
+      pista.append(relleno);
+
+      const total = document.createElement("span");
+      total.className = "result-bar-total";
+      total.textContent =
+        `${resultado.cantidad} ` +
+        `${resultado.cantidad === 1 ? "persona" : "personas"} ` +
+        `(${formatearPorcentaje(porcentaje)})`;
+
+      fila.append(etiqueta, pista, total);
+      barras.append(fila);
+    });
+
+    tarjeta.append(encabezado, barras);
+    resultsList.append(tarjeta);
   });
 }
 
@@ -348,13 +333,9 @@ function formatearNumero(numero) {
 }
 
 function reiniciarEncuesta() {
-  if (grafica) {
-    grafica.destroy();
-    grafica = null;
-  }
-
   preguntaActual = 0;
   respuestas = [];
+  quizCard.classList.remove("results-active");
   quizStatus.textContent = "";
   resultsStatus.textContent = "";
   resultsSection.hidden = true;

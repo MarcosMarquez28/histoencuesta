@@ -21,6 +21,17 @@
     <script src="script.js" defer></script>
   </head>
   <body>
+    <button
+      id="themeToggleButton"
+      class="theme-toggle-button"
+      type="button"
+      aria-label="Cambiar a modo claro"
+      aria-pressed="false"
+      title="Cambiar a modo claro"
+    >
+      <span class="theme-icon theme-icon-sun" aria-hidden="true">☀️</span>
+      <span class="theme-icon theme-icon-moon" aria-hidden="true">🌙</span>
+    </button>
     <main class="page-shell">
       <section class="quiz-card" aria-label="Encuesta sobre Histología II y el sistema digestivo">
         <header class="brand-header">
@@ -57,7 +68,7 @@
             </svg>
           </div>
           <p class="eyebrow">UNA PAUSA PARA DESCUBRIR</p>
-          <div class="test-switch" role="group" aria-label="Seleccionar tipo de cuestionario">
+          <div class="test-switch pre-test-only" role="group" aria-label="Tipo de cuestionario disponible">
             <button
               id="preTestButton"
               class="test-switch-button"
@@ -69,7 +80,7 @@
             </button>
             <button
               id="postTestButton"
-              class="test-switch-button"
+              class="test-switch-button hidden-test"
               type="button"
               data-test-type="post"
               aria-pressed="false"
@@ -77,7 +88,7 @@
               Post-Test
             </button>
           </div>
-          <h1 id="welcome-title">Encuesta sobre Histología II - Pre-Test</h1>
+          <h1 id="welcome-title">Encuesta sobre Histología II - <span class="no-wrap">Pre-Test</span></h1>
           <p id="welcome-description" class="welcome-description">
             Responde las 12 preguntas del Pre-Test sobre Histología II y el sistema
             digestivo usando una escala Likert del 1 al 5.
@@ -90,11 +101,16 @@
         <div id="quizSection" class="quiz-content" hidden>
           <div class="intro-copy">
             <p id="quiz-eyebrow" class="eyebrow">ENCUESTA DE HISTOLOGÍA II · PRE-TEST</p>
-            <h1 id="page-title">Sistema digestivo</h1>
             <p class="intro-description">
               Lee cada pregunta y elige cuánto estás de acuerdo. No hay
               respuestas correctas o incorrectas.
             </p>
+            <h2
+              id="questionText"
+              class="question-title"
+              tabindex="-1"
+              aria-live="polite"
+            ></h2>
           </div>
 
           <div
@@ -118,7 +134,6 @@
           </div>
 
           <div class="question-area" aria-live="polite" aria-atomic="true">
-            <h2 id="questionText" class="question-title" tabindex="-1"></h2>
             <div id="optionsList" class="options-list"></div>
           </div>
 

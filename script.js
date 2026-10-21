@@ -51,13 +51,13 @@ const startSurveyButton = document.querySelector("#start-survey-btn");
 const testSwitchButtons = document.querySelectorAll(".test-switch-button");
 const welcomeTitle = document.querySelector("#welcome-title");
 const welcomeDescription = document.querySelector("#welcome-description");
+const themeToggleButton = document.querySelector("#themeToggleButton");
 const quizCard = document.querySelector(".quiz-card");
 const quizSection = document.querySelector("#quizSection");
 const resultsSection = document.querySelector("#resultsSection");
 const quizEyebrow = document.querySelector("#quiz-eyebrow");
 const resultsEyebrow = document.querySelector("#results-eyebrow");
 const resultsTitle = document.querySelector("#resultsTitle");
-const pageTitle = document.querySelector("#page-title");
 const questionText = document.querySelector("#questionText");
 const optionsList = document.querySelector("#optionsList");
 const progressText = document.querySelector("#progressText");
@@ -80,6 +80,21 @@ let respuestas = [];
 let tipoPruebaActiva = "pre";
 let preguntas = preguntasPreTest;
 
+function aplicarTema(modoClaro) {
+  document.body.classList.toggle("light-mode", modoClaro);
+  const etiqueta = modoClaro ? "Cambiar a modo oscuro" : "Cambiar a modo claro";
+  themeToggleButton.setAttribute("aria-label", etiqueta);
+  themeToggleButton.setAttribute("title", etiqueta);
+  themeToggleButton.setAttribute("aria-pressed", String(modoClaro));
+}
+
+aplicarTema(localStorage.getItem("histoencuesta-theme") === "light");
+themeToggleButton.addEventListener("click", () => {
+  const modoClaro = !document.body.classList.contains("light-mode");
+  localStorage.setItem("histoencuesta-theme", modoClaro ? "light" : "dark");
+  aplicarTema(modoClaro);
+});
+
 function seleccionarTipoPrueba(tipo) {
   if (!Object.hasOwn(pruebas, tipo)) {
     throw new Error(`Tipo de prueba no válido: ${tipo}`);
@@ -93,13 +108,18 @@ function seleccionarTipoPrueba(tipo) {
 
   const nombrePrueba = pruebas[tipo].nombre;
   const tituloPrueba = `Encuesta sobre Histología II - ${nombrePrueba}`;
-  welcomeTitle.textContent = tituloPrueba;
+  const sufijoTitulo = document.createElement("span");
+  sufijoTitulo.className = "no-wrap";
+  sufijoTitulo.textContent = nombrePrueba;
+  welcomeTitle.replaceChildren(
+    document.createTextNode("Encuesta sobre Histología II - "),
+    sufijoTitulo,
+  );
   document.title = tituloPrueba;
   welcomeDescription.textContent =
     `Responde las 12 preguntas del ${nombrePrueba} sobre Histología II y el ` +
     "sistema digestivo usando una escala Likert del 1 al 5.";
   quizEyebrow.textContent = `ENCUESTA DE HISTOLOGÍA II · ${nombrePrueba.toUpperCase()}`;
-  pageTitle.textContent = `Sistema digestivo · ${nombrePrueba}`;
   resultsEyebrow.textContent =
     `RESULTADOS DE LA ENCUESTA · ${nombrePrueba.toUpperCase()}`;
   resultsTitle.textContent = `Resultados globales · ${nombrePrueba}`;
@@ -112,6 +132,15 @@ function renderizarPregunta() {
   );
 
   questionText.textContent = preguntas[preguntaActual];
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    questionText.animate(
+      [
+        { opacity: 0, transform: "translateY(7px)" },
+        { opacity: 1, transform: "translateY(0)" },
+      ],
+      { duration: 240, easing: "ease-out" },
+    );
+  }
   progressText.textContent = `Pregunta ${numeroPregunta} de ${preguntas.length}`;
   progressPercent.textContent = `${porcentaje} %`;
   progressBar.setAttribute("aria-valuemax", "100");

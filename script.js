@@ -13,17 +13,17 @@ const escalaLikert = [
 
 const preguntasPreTest = [
   "¿Considera usted que puede reconocer las características histológicas de los órganos del sistema digestivo?",
-  "¿Considera usted que puede distinguir microscópicamente la capa mucosa de la submucosa?",
-  "¿Considera usted que puede identificar las células de Paneth en una microfotografía histológica del intestino delgado específicamente en el yeyuno?",
+  "¿Cree usted que puede distinguir microscópicamente las capas que conforman al tubo digestivo?",
+  "¿Estima usted que puede identificar las células de Paneth en una microfotografía histológica del intestino delgado específicamente en el yeyuno?",
   "¿Considera usted que la zona de transición epitelial esofagogástrica es compleja de identificar?",
-  "¿Considera usted que los materiales anteriores le brindan suficientes pautas para el estudio autónomo de la asignatura Histología II?",
+  "¿Cree usted que una guía digital le brinda suficientes pautas para el estudio autónomo de la asignatura Histología II?",
   "¿Suele usted apoyarse en herramientas digitales para preparar las prácticas de Histología del sistema digestivo?",
   "¿Usa usted un método de estudio que integre de forma estructurada esquemas teóricos, microfotografías con sus aumentos y textos explicativos?",
   "¿Puede usted revisar cómodamente microfotografías de láminas histológicas desde cualquier dispositivo?",
   "¿Considera usted que un recurso adicional le serviría como complemento para su aprendizaje en las prácticas del sistema digestivo?",
-  "¿Considera usted que domina el uso de herramientas e interfaces digitales interactivas aplicadas al aprendizaje de la histología?",
+  "¿Cree usted que domina el uso de herramientas e interfaces digitales interactivas aplicadas al aprendizaje de la Histología II?",
   "¿Aplica usted un método ordenado para explorar y analizar los preparados del sistema digestivo?",
-  "¿Considera usted que domina los conceptos teóricos requeridos para comprender las prácticas del sistema digestivo?",
+  "¿Estima usted que domina los conceptos teóricos requeridos para comprender las prácticas del sistema digestivo?",
 ];
 
 const preguntasPostTest = [
